@@ -56,19 +56,15 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
-    }
-
-    public String generateToken(
-        Map<String, Object> extraClaims,
-        UserDetails userDetails
-    ) {
-        return Jwts
-            .builder()
-            .setClaims(extraClaims)
+        Claims claims = Jwts.claims()
             .setSubject(userDetails.getUsername())
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24));
+        claims.put("roles", userDetails.getAuthorities());
+
+        return Jwts
+            .builder()
+            .setClaims(claims)
             .signWith(getSignInKey(), SignatureAlgorithm.HS256)
             .compact();
     }

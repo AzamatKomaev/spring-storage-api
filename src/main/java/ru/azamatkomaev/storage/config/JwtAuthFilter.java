@@ -68,7 +68,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throw new UnauthorizedException("Cannot extract username from token");
         }
 
-
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 

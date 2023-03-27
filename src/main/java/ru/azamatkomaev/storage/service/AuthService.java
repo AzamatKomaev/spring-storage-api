@@ -13,7 +13,9 @@ import ru.azamatkomaev.storage.request.RegisterRequest;
 import ru.azamatkomaev.storage.response.LoginResponse;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AuthService {
@@ -34,7 +36,7 @@ public class AuthService {
     }
 
     public User register(RegisterRequest request) {
-        Role userDefaultRole = roleService.getByName("user");
+        Role userDefaultRole = roleService.getByName("ROLE_USER");
 
         User user = User.builder()
             .username(request.getUsername())
@@ -48,19 +50,14 @@ public class AuthService {
         return userService.save(user);
     }
 
-    public LoginResponse login(LoginRequest request) {
+    public String login(User user, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            request.getUsername(),
-            request.getPassword()
+            user.getUsername(),
+            password,
+            user.getAuthorities()
         );
 
-        // here BadCredentialsException can be thrown
         authenticationManager.authenticate(authenticationToken);
-
-        User user = userService.getByUsername(request.getUsername());
-        String token = jwtService.generateToken(user);
-        return LoginResponse.builder()
-            .token(token)
-            .build();
+        return jwtService.generateToken(user);
     }
 }

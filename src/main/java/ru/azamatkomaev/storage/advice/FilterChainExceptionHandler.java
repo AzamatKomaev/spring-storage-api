@@ -24,6 +24,7 @@ public class FilterChainExceptionHandler extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Exception: " + e.getMessage());
             resolver.resolveException(request, response, null, e);
         }
     }
