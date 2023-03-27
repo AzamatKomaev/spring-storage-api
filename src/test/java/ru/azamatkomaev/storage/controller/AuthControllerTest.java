@@ -32,8 +32,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -116,8 +115,10 @@ public class AuthControllerTest {
 
     @Test
     public void testSuccessfulRegisterUser() throws Exception {
+        String username = "Azamat";
+
         RegisterRequest request = RegisterRequest.builder()
-            .username("Azamat")
+            .username(username)
             .password("azamat12345")
             .build();
 
@@ -125,7 +126,10 @@ public class AuthControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(request));
         mockMvc.perform(requestBuilder)
-            .andExpect(status().is(201));
+            .andDo(print())
+            .andExpect(status().is(201))
+            .andExpect(jsonPath("$.id").isNumber())
+            .andExpect(jsonPath("$.username", is(username)));
     }
 
     @Test
@@ -202,11 +206,8 @@ public class AuthControllerTest {
         requestBuilder = get(GET_ME_ENDPOINT_PATH)
             .header("Authorization", "Bearer " + token);
         mockMvc.perform(requestBuilder)
-            .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").isNumber())
             .andExpect(jsonPath("$.username", is("general_user")));
-
-        //TODO: /api/v1/auth/me -> test 200 with token
     }
 }

@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6
+      author: azamatkomaev
+      changes:
+        - createTable:
+            tableName: files
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_path
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(255)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+
+
+
