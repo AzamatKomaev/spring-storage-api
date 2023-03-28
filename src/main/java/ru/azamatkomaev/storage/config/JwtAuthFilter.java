@@ -27,28 +27,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
-    private final RequestMatcher[] requestMatchers;
-
     public JwtAuthFilter(JwtService jwtService, UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
-        this.requestMatchers = new RequestMatcher[]{
-            new AntPathRequestMatcher("/api/v1/auth/login"),
-            new AntPathRequestMatcher("/api/v1/auth/register")
-        };
     }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)  throws ServletException, IOException {
-        for (RequestMatcher matcher : this.requestMatchers) {
-            if (matcher.matches(request)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-        }
-
         final String authHeader = request.getHeader("Authorization");
         final String token;
         final String username;

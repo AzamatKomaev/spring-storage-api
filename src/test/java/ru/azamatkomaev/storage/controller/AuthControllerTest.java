@@ -2,7 +2,6 @@ package ru.azamatkomaev.storage.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.collections4.map.ReferenceMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,6 @@ import ru.azamatkomaev.storage.repository.UserRepository;
 import ru.azamatkomaev.storage.request.LoginRequest;
 import ru.azamatkomaev.storage.request.RegisterRequest;
 
-import javax.lang.model.type.ReferenceType;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +30,8 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest
@@ -56,15 +55,15 @@ public class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
+        roleRepository.deleteAll();
+        userRepository.deleteAll();
+
         this.mockMvc = MockMvcBuilders.
             webAppContextSetup(this.webApplicationContext)
             .apply(springSecurity())
             .build();
 
-        roleRepository.deleteAll();
-        userRepository.deleteAll();
-
-        Role defaultRole = Role.builder().name("user").build();
+        Role defaultRole = Role.builder().name("ROLE_USER").build();
         User user = User.builder()
             .username("general_user")
             .password(passwordEncoder.encode("password12345"))

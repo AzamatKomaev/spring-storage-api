@@ -29,20 +29,14 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        String[] securityPatterns = {
-            "/api/v1/users/**",
-            "/api/v1/events/**",
-            "/api/v1/files/**",
-            "/api/v1/auth/me"
-        };
-
         http
             .csrf().disable()
             .authorizeHttpRequests()
-            .requestMatchers("/api/v1/auth/login").permitAll()
-            .requestMatchers("/api/v1/auth/register").permitAll()
-            // .requestMatchers(securityPatterns).authenticated()
-            .anyRequest().authenticated()
+            .requestMatchers(HttpMethod.POST, "/api/v1/users").authenticated()
+            .requestMatchers(HttpMethod.PUT, "/api/v1/users").authenticated()
+            .requestMatchers(HttpMethod.POST, "/api/v1/files").authenticated()
+            .requestMatchers(HttpMethod.PUT, "/api/v1/files").authenticated()
+            .anyRequest().permitAll()
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
