@@ -29,21 +29,14 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        // requestMatchers do not work here. So they are moved to jwtAuthFilter.
+        return http
             .csrf().disable()
-            .authorizeHttpRequests()
-            .requestMatchers(HttpMethod.POST, "/api/v1/users").authenticated()
-            .requestMatchers(HttpMethod.PUT, "/api/v1/users").authenticated()
-            .requestMatchers(HttpMethod.POST, "/api/v1/files").authenticated()
-            .requestMatchers(HttpMethod.PUT, "/api/v1/files").authenticated()
-            .anyRequest().permitAll()
-            .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(filterChainExceptionHandler, jwtAuthFilter.getClass())
-            .authenticationProvider(authenticationProvider);
-
-        return http.build();
+            .authenticationProvider(authenticationProvider)
+            .build();
     }
 }

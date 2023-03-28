@@ -20,8 +20,6 @@ public class FileController {
         Principal principal,
         @RequestParam("file") MultipartFile file
     ) {
-        System.out.println("Current user: " + principal.getName());
-        System.out.println(file.getOriginalFilename());
         return ResponseEntity.ok("It works!");
     }
 }

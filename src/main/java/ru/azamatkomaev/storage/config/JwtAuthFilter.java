@@ -4,8 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,13 +19,18 @@ import ru.azamatkomaev.storage.exception.UnauthorizedException;
 import ru.azamatkomaev.storage.service.JwtService;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final List<RequestMatcher> authenticatedEndpoints = new ArrayList<>(List.of(
+        new AntPathRequestMatcher("/api/v1/auth/me", "GET"),
+        new AntPathRequestMatcher("/api/v1/files", "POST")
+    ));
 
     public JwtAuthFilter(JwtService jwtService, UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
@@ -36,6 +41,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)  throws ServletException, IOException {
+
+        if (authenticatedEndpoints.stream().noneMatch(matcher -> matcher.matches(request))) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
         final String token;
         final String username;

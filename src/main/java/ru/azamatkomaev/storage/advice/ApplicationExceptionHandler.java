@@ -64,7 +64,6 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler({UnauthorizedException.class})
     public Map<String, String> handleUnauthorizedException(UnauthorizedException ex) {
-        System.out.println("I was thrown!!!");
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("message", ex.getMessage());
         return errorMap;
