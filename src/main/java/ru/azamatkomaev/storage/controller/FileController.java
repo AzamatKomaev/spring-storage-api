@@ -20,6 +20,6 @@ public class FileController {
         Principal principal,
         @RequestParam("file") MultipartFile file
     ) {
-        return ResponseEntity.ok("It works!");
+        return ResponseEntity.ok(file.getOriginalFilename());
     }
 }

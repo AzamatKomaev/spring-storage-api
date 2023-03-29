@@ -1,6 +1,7 @@
 package ru.azamatkomaev.storage.advice;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
 import ru.azamatkomaev.storage.exception.NotFoundException;
 import ru.azamatkomaev.storage.exception.UnauthorizedException;
 
@@ -62,10 +64,18 @@ public class ApplicationExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler({UnauthorizedException.class})
+    @ExceptionHandler(UnauthorizedException.class)
     public Map<String, String> handleUnauthorizedException(UnauthorizedException ex) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("message", ex.getMessage());
+        return errorMap;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MultipartException.class)
+    public Map<String, String> handleMultipartExceptionException(MultipartException ex) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("message", "no multipart boundary was found");
         return errorMap;
     }
 }
