@@ -39,7 +39,7 @@ public class AuthController {
     public ResponseEntity<UserResponse> register(
         @RequestBody @Valid RegisterRequest request
     ) {
-        User registeredUser = authService.register(request);
+        User registeredUser = authService.register(request.getUsername(), request.getPassword());
         return new ResponseEntity<>(UserResponse.toUserResponse(registeredUser), HttpStatus.CREATED);
     }
 

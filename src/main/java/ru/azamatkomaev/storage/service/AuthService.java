@@ -35,12 +35,12 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    public User register(RegisterRequest request) {
+    public User register(String username, String password) {
         Role userDefaultRole = roleService.getByName("ROLE_USER");
 
         User user = User.builder()
-            .username(request.getUsername())
-            .password(passwordEncoder.encode(request.getPassword()))
+            .username(username)
+            .password(passwordEncoder.encode(password))
             .roles(List.of(userDefaultRole))
             .status(Status.ACTIVE)
             .createdAt(new Date())

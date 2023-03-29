@@ -1,15 +1,15 @@
 package ru.azamatkomaev.storage.advice;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MultipartException;
+import ru.azamatkomaev.storage.exception.FileUploadServerException;
 import ru.azamatkomaev.storage.exception.NotFoundException;
 import ru.azamatkomaev.storage.exception.UnauthorizedException;
 
@@ -28,8 +28,8 @@ public class ApplicationExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleInvalidArgument(MethodArgumentNotValidException ex) {
+    @ExceptionHandler(BindException.class)
+    public Map<String, String> handleBindException(BindException ex) {
         Map<String, String> errorMap = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach(error -> {
@@ -76,6 +76,14 @@ public class ApplicationExceptionHandler {
     public Map<String, String> handleMultipartExceptionException(MultipartException ex) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("message", "no multipart boundary was found");
+        return errorMap;
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(FileUploadServerException.class)
+    public Map<String, String> handleFileUploadServerException(FileUploadServerException ex) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("message", ex.getMessage());
         return errorMap;
     }
 }
