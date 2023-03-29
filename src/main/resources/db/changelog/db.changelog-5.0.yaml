@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 7
+      author: azamatkomaev
+      changes:
+        - createTable:
+            tableName: events
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(255)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: events
+            constraintName: events_user_id_fk
+            referencedColumnNames: id
+            referencedTableName: users
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseColumnNames: file_id
+            baseTableName: events
+            constraintName: events_file_id_fk
+            referencedColumnNames: id
+            referencedTableName: files
+            onDelete: CASCADE
