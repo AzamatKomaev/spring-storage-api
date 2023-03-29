@@ -46,7 +46,6 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        roleRepository.deleteAll();
         userRepository.deleteAll();
 
         this.mockMvc = MockMvcBuilders.
@@ -54,8 +53,8 @@ public class UserControllerTest {
             .apply(springSecurity())
             .build();
 
-        Role defaultRole = Role.builder().name("ROLE_USER").build();
-        roleRepository.save(defaultRole);
+        Role defaultRole = roleRepository.findByName("ROLE_USER").orElse(null);
+        assert defaultRole != null;
 
         String[] usernames = {"Azamat", "Vladimir", "Mikhail"};
         Arrays.stream(usernames).forEach(username -> {
