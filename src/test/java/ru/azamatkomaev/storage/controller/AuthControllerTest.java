@@ -55,7 +55,6 @@ public class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        roleRepository.deleteAll();
         userRepository.deleteAll();
 
         this.mockMvc = MockMvcBuilders.
@@ -63,7 +62,9 @@ public class AuthControllerTest {
             .apply(springSecurity())
             .build();
 
-        Role defaultRole = Role.builder().name("ROLE_USER").build();
+        Role defaultRole = roleRepository.findByName("ROLE_USER").orElse(null);
+        assert defaultRole != null;
+
         User user = User.builder()
             .username("general_user")
             .password(passwordEncoder.encode("password12345"))
@@ -73,7 +74,6 @@ public class AuthControllerTest {
             .updatedAt(new Date())
             .build();
 
-        roleRepository.save(defaultRole);
         userRepository.save(user);
     }
 

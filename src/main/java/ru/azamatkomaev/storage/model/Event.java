@@ -16,23 +16,17 @@ import org.hibernate.annotations.OnDeleteAction;
 @AllArgsConstructor
 public class Event {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @Column(name = "user_id")
-    private Integer userId;
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "file_id", nullable = false, insertable = false, updatable = false)
+    @JoinColumn(name = "file_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private File file;
-
-    @Column(name = "file_id")
-    private Integer fileId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

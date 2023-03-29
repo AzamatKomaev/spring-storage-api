@@ -11,7 +11,7 @@ import java.nio.file.Path;
 
 @Service
 public class FileSystemStorageService implements StorageService {
-    private final ClassPathResource pathResource = new ClassPathResource("media", this.getClass());
+    private final ClassPathResource pathResource = new ClassPathResource("media");
 
     @Override
     public String store(MultipartFile file) {
