@@ -45,4 +45,14 @@ public class FileSystemStorageService implements StorageService {
             throw new FileUploadServerException(e.getMessage());
         }
     }
+
+    @Override
+    public boolean deleteFileByFilename(String filename) {
+        try {
+            File file = new File(pathResource.getFile().getPath() + "/" + filename);
+            return file.delete();
+        } catch (IOException e) {
+            throw new FileUploadServerException(e.getMessage());
+        }
+    }
 }
