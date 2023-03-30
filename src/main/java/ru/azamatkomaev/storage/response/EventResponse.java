@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.azamatkomaev.storage.model.Event;
-import ru.azamatkomaev.storage.model.File;
-import ru.azamatkomaev.storage.model.User;
 
 @Data
 @NoArgsConstructor
@@ -15,13 +13,13 @@ import ru.azamatkomaev.storage.model.User;
 public class EventResponse {
     private Long id;
     private UserResponse user;
-    private File file;
+    private FileResponse file;
 
     public static EventResponse toEventResponse(Event event) {
         return EventResponse.builder()
             .id(event.getId())
             .user(UserResponse.toUserResponse(event.getUser()))
-            .file(event.getFile())
+            .file(FileResponse.toFileResponse(event.getFile()))
             .build();
     }
 }

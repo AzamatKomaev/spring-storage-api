@@ -1,10 +1,11 @@
 package ru.azamatkomaev.storage.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -22,13 +23,12 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FileControllerTest {
 
     @Autowired
@@ -43,9 +43,11 @@ public class FileControllerTest {
     private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
-    private String jwtAuthToken;
     private final ObjectMapper mapper = new ObjectMapper();
-    private final String LOGIN_ENDPOINT_PATH = "/api/v1/auth/login";
+
+    private String AUTH_TOKEN;
+    private final String GET_ME_ENDPOINT_PATH = "/api/v1/auth/me";
+    private final String FILE_LIST_ENDPOINT_PATH = "/api/v1/files";
 
 
     @BeforeEach
@@ -68,17 +70,79 @@ public class FileControllerTest {
             .createdAt(new Date())
             .updatedAt(new Date())
             .build();
-        jwtAuthToken = jwtService.generateToken(user);
+        AUTH_TOKEN = jwtService.generateToken(user);
         userRepository.save(user);
     }
 
     @Test
+    @Order(1)
     public void testGetMe() throws Exception {
-        RequestBuilder requestBuilder = get("/api/v1/auth/me")
-            .header("Authorization", "Bearer " + jwtAuthToken);
+        RequestBuilder requestBuilder = get(GET_ME_ENDPOINT_PATH)
+            .header("Authorization", "Bearer " + AUTH_TOKEN);
         mockMvc.perform(requestBuilder)
             .andExpect(status().isOk())
-            .andDo(print());
+            .andExpect(jsonPath("$.id").exists())
+            .andExpect(jsonPath("$.username", is("general_user")));
     }
 
+    @Test
+    public void testAddFileWithoutAuthorization() throws Exception {
+        RequestBuilder requestBuilder = post(FILE_LIST_ENDPOINT_PATH);
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.message", is("Cannot get token: header does not exist or not valid")));
+    }
+
+    @Test
+    public void testAddFileWithInvalidAuthToken() throws Exception {
+        RequestBuilder requestBuilder = post(FILE_LIST_ENDPOINT_PATH)
+            .header("Authorization", "abc" + AUTH_TOKEN);
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.message", is("Cannot get token: header does not exist or not valid")));
+    }
+
+    @Test
+    public void testAddFileWithoutNoMultipartHeader() throws Exception {
+        RequestBuilder requestBuilder = post(FILE_LIST_ENDPOINT_PATH)
+            .header("Authorization", "Bearer " + AUTH_TOKEN);
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", is("no multipart boundary was found")));
+    }
+
+    @Test
+    public void testAddFileWithoutProvidingFile() throws Exception {
+        RequestBuilder requestBuilder = post(FILE_LIST_ENDPOINT_PATH)
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .header("Authorization", "Bearer " + AUTH_TOKEN);
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isBadRequest());
+    }
+
+    @Order(100)
+    @Test
+    public void testSuccessfullyAddFile() throws Exception {
+        System.out.println("50 test....");
+        MockMultipartFile file = new MockMultipartFile(
+            "file",
+            "hello.txt",
+            MediaType.TEXT_PLAIN_VALUE,
+            "Hello, World!".getBytes()
+        );
+
+        RequestBuilder requestBuilder = multipart(FILE_LIST_ENDPOINT_PATH)
+            .file(file)
+            .header("Authorization", "Bearer " + AUTH_TOKEN);
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").isNumber())
+
+            .andExpect(jsonPath("$.user.id").isNumber())
+            .andExpect(jsonPath("$.user.username", is("general_user")))
+
+            .andExpect(jsonPath("$.file.id").isNumber())
+            .andExpect(jsonPath("$.file.name", is("hello.txt")))
+            .andExpect(jsonPath("$.file.file_path", is("hello.txt")));
+    }
 }

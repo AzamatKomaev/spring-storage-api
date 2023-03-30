@@ -113,7 +113,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testSuccessfulRegisterUser() throws Exception {
+    public void testSuccessfullyRegisterUser() throws Exception {
         String username = "Azamat";
 
         RegisterRequest request = RegisterRequest.builder()
