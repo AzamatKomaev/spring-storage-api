@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,6 +42,7 @@ public class UserControllerTest {
 
     private MockMvc mockMvc;
     private final ObjectMapper mapper = new ObjectMapper();
+
     private final String GET_ALL_USERS_ENDPOINT_PATH = "/api/v1/users";
 
     @BeforeEach
@@ -74,7 +75,18 @@ public class UserControllerTest {
     public void testGetAllUsers() throws Exception {
         RequestBuilder requestBuilder = get(GET_ALL_USERS_ENDPOINT_PATH);
         mockMvc.perform(requestBuilder)
-            .andDo(print())
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(3)))
+            .andExpect(jsonPath("$[*].username", containsInAnyOrder(
+                "Azamat", "Vladimir", "Mikhail"
+            )));
+    }
+
+    @Test
+    public void testGetUserByNonExistingId() throws Exception {
+        RequestBuilder requestBuilder = get(GET_ALL_USERS_ENDPOINT_PATH + "/1234");
+        mockMvc.perform(requestBuilder)
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message", is("Cannot find any user with id: 1234")));
     }
 }
