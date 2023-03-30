@@ -123,7 +123,6 @@ public class FileControllerTest {
     @Order(100)
     @Test
     public void testSuccessfullyAddFile() throws Exception {
-        System.out.println("50 test....");
         MockMultipartFile file = new MockMultipartFile(
             "file",
             "hello.txt",
