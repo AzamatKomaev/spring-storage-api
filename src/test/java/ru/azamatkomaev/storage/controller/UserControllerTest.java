@@ -72,7 +72,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetAllUsers() throws Exception {
+    public void testSuccessfullyGetAllUsers() throws Exception {
         RequestBuilder requestBuilder = get(GET_ALL_USERS_ENDPOINT_PATH);
         mockMvc.perform(requestBuilder)
             .andExpect(status().isOk())

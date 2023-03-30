@@ -1,13 +1,14 @@
 package ru.azamatkomaev.storage.service.storage;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.azamatkomaev.storage.exception.FileUploadServerException;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 @Service
 public class FileSystemStorageService implements StorageService {
@@ -25,17 +26,12 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public Path load(String filename) {
-        return null;
-    }
-
-    @Override
-    public void deleteByFilename(String filename) {
-
-    }
-
-    @Override
-    public void deleteAll() {
-
+    public Resource loadAsResource(String filename) {
+        try {
+            File file = new File(pathResource.getFile().getPath() + "/" + filename);
+            return new FileSystemResource(file);
+        } catch (IOException e) {
+            throw new FileUploadServerException(e.getMessage());
+        }
     }
 }

@@ -25,6 +25,12 @@ public class FileService {
         return fileRepository.findAll();
     }
 
+    public File getById(Long id) {
+        return fileRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Cannot find any file with id: " + id));
+    }
+
     public Event save(String username, String filename) {
         User user = userService.getByUsername(username);
         File uploadedFile = fileRepository.save(
