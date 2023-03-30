@@ -9,6 +9,8 @@ import ru.azamatkomaev.storage.exception.FileUploadServerException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Service
 public class FileSystemStorageService implements StorageService {
@@ -30,6 +32,15 @@ public class FileSystemStorageService implements StorageService {
         try {
             File file = new File(pathResource.getFile().getPath() + "/" + filename);
             return new FileSystemResource(file);
+        } catch (IOException e) {
+            throw new FileUploadServerException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteAllFiles() {
+        try {
+            Arrays.stream(Objects.requireNonNull(pathResource.getFile().listFiles())).forEach(File::delete);
         } catch (IOException e) {
             throw new FileUploadServerException(e.getMessage());
         }
