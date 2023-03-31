@@ -38,4 +38,8 @@ public class FileService {
         );
         return eventService.save(user, uploadedFile);
     }
+
+    public void deleteById(Long id) {
+        fileRepository.deleteById(id);
+    }
 }

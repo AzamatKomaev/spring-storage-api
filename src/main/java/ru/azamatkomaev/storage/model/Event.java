@@ -1,10 +1,7 @@
 package ru.azamatkomaev.storage.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -23,10 +20,16 @@ public class Event {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private Long userId;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "file_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private File file;
+
+    @Column(name = "file_id", insertable = false, updatable = false)
+    private Long fileId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -26,6 +26,12 @@ public class EventService {
             .orElseThrow(() -> new NotFoundException("Cannot find any event with id: " + id));
     }
 
+    public Event getByFileId(Long fileId) {
+        return eventRepository
+            .findByFileId(fileId)
+            .orElseThrow(() -> new NotFoundException("Cannot find any event with file_id: " + fileId));
+    }
+
     public Event save(User user, File file) {
         Event event = Event.builder().user(user).file(file).build();
         return eventRepository.save(event);

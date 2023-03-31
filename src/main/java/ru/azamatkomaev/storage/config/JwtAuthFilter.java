@@ -29,7 +29,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final List<RequestMatcher> authenticatedEndpoints = new ArrayList<>(List.of(
         new AntPathRequestMatcher("/api/v1/auth/me", "GET"),
         new AntPathRequestMatcher("/api/v1/files", "POST"),
-        new AntPathRequestMatcher("/api/v1/files", "DELETE")
+        new AntPathRequestMatcher("/api/v1/files/**", "DELETE")
     ));
 
     public JwtAuthFilter(JwtService jwtService, UserDetailsService userDetailsService) {

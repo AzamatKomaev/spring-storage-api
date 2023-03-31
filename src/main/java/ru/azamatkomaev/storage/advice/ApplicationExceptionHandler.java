@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MultipartException;
 import ru.azamatkomaev.storage.exception.FileUploadServerException;
 import ru.azamatkomaev.storage.exception.NotFoundException;
+import ru.azamatkomaev.storage.exception.PermissionDeniedException;
 import ru.azamatkomaev.storage.exception.UnauthorizedException;
 
 import java.util.HashMap;
@@ -82,6 +83,14 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(FileUploadServerException.class)
     public Map<String, String> handleFileUploadServerException(FileUploadServerException ex) {
+        Map<String, String> errorMap = new HashMap<>();
+        errorMap.put("message", ex.getMessage());
+        return errorMap;
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(PermissionDeniedException.class)
+    public Map<String, String> handlePermissionDeniedException(PermissionDeniedException ex) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("message", ex.getMessage());
         return errorMap;
